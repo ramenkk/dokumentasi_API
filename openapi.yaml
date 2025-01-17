@@ -1,0 +1,315 @@
+openapi: 3.0.3
+info:
+  title: API Dokumentasi Restoran Ramen
+  description: Dokumentasi API untuk mengelola menu ramen dan pesanan.
+  version: 1.0.0
+servers:
+  - url: https://asia-southeast2-menurestoran-443909.cloudfunctions.net/menurestoran
+paths:
+  /data/menu_ramen:
+    get:
+      tags:
+        - Menu Ramen
+      summary: Mendapatkan semua data menu ramen
+      operationId: getMenuRamen
+      responses:
+        "200":
+          description: Daftar menu ramen berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+        "400":
+          description: Terjadi kesalahan dalam permintaan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error retrieving data"
+
+  /tambah/menu_ramen:
+    post:
+      tags:
+        - Menu Ramen
+      summary: Menambahkan menu ramen baru
+      operationId: postMenuRamen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Menu'
+      responses:
+        "201":
+          description: Menu ramen berhasil ditambahkan
+        "400":
+          description: Kesalahan saat menambahkan menu ramen
+
+  /ubah/menu_ramen:
+    put:
+      tags:
+        - Menu Ramen
+      summary: Mengubah data menu ramen
+      operationId: putMenuRamen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Menu'
+      responses:
+        "200":
+          description: Menu ramen berhasil diubah
+        "400":
+          description: Kesalahan saat mengubah menu ramen
+
+  /hapus/menu_ramen:
+    delete:
+      tags:
+        - Menu Ramen
+      summary: Menghapus menu ramen
+      operationId: deleteMenuRamen
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: objectId
+      responses:
+        "200":
+          description: Menu ramen berhasil dihapus
+        "400":
+          description: Kesalahan saat menghapus menu ramen
+
+  /data/pesanan:
+    get:
+      tags:
+        - Pesanan
+      summary: Mendapatkan semua data pesanan
+      operationId: getPesanan
+      responses:
+        "200":
+          description: Daftar pesanan berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pesanan'
+        "400":
+          description: Terjadi kesalahan dalam permintaan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error retrieving data"
+
+
+
+
+  /tambah/pesanan:
+    post:
+      tags:
+        - Pesanan
+      summary: Menambahkan pesanan baru
+      operationId: postPesanan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pesanan'
+      responses:
+        "201":
+          description: Pesanan berhasil ditambahkan
+        "400":
+          description: Kesalahan saat menambahkan pesanan
+
+          /data/bystatus:
+    get:
+      tags:
+        - Pesanan
+      summary: Mendapatkan pesanan berdasarkan status
+      operationId: getPesananByStatus
+      parameters:
+        - name: status
+          in: query
+          description: Status pesanan yang ingin diambil (baru, diproses, selesai)
+          required: true
+          schema:
+            type: string
+            enum: ["baru", "diproses", "selesai"]
+      responses:
+        "200":
+          description: Daftar pesanan berdasarkan status berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/pesanan'
+        "400":
+          description: Status pesanan tidak valid atau tidak disertakan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Status pesanan harus disertakan"
+        "404":
+          description: Pesanan tidak ditemukan dengan status tersebut
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Pesanan tidak ditemukan dengan status ini"
+
+  /update/status:
+    patch:
+      tags:
+        - Pesanan
+      summary: Memperbarui status pesanan
+      operationId: updatePesananStatus
+      parameters:
+        - name: id
+          in: query
+          description: ID pesanan yang akan diperbarui
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Data untuk memperbarui status pesanan
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status_pesanan:
+                  type: string
+                  description: Status baru untuk pesanan (baru, diproses, selesai)
+                  example: "diproses"
+      responses:
+        "200":
+          description: Status pesanan berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Status pesanan berhasil diperbarui"
+        "400":
+          description: ID pesanan tidak valid atau status tidak valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "ID pesanan tidak valid"
+        "404":
+          description: Pesanan tidak ditemukan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Pesanan tidak ditemukan"
+        "500":
+          description: Terjadi kesalahan pada server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Terjadi kesalahan pada server"
+
+components:
+  schemas:
+    Menu:
+      type: object
+      properties:
+        nama_menu:
+          type: string
+          description: Nama menu
+        harga:
+          type: number
+          format: double
+          description: Harga menu
+        deskripsi:
+          type: string
+          description: Deskripsi menu
+        gambar:
+          type: string
+          description: URL gambar menu
+        kategori:
+          type: string
+          description: Kategori menu
+
+    Pesanan:
+      type: object
+      properties:
+
+        nama_pelanggan:
+          type: string
+          description: Nama pelanggan
+        nomor_meja:
+          type: integer
+          description: Nomor meja pelanggan
+        daftar_menu:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemPesanan'
+          description: Daftar menu yang dipesan
+        total_harga:
+          type: number
+          format: double
+          description: Total harga pesanan
+        tanggal_pesanan:
+          type: string
+          format: date-time
+          description: Tanggal dan waktu pesanan dibuat
+        catatan_pesanan:
+          type: string
+          description: Catatan tambahan untuk pesanan
+
+    ItemPesanan:
+      type: object
+      properties:
+        nama_menu:
+          type: string
+          description: Nama menu
+        jumlah:
+          type: integer
+          description: Jumlah menu yang dipesan
+        harga_satuan:
+          type: number
+          format: double
+          description: Harga satuan menu
+        subtotal:
+          type: number
+          format: double
+          description: Subtotal harga menu
+
+          
