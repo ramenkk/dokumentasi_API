@@ -3,8 +3,10 @@ info:
   title: API Dokumentasi Restoran Ramen
   description: Dokumentasi API untuk mengelola menu ramen dan pesanan.
   version: 1.0.0
+
 servers:
   - url: https://asia-southeast2-menurestoran-443909.cloudfunctions.net/menurestoran
+
 paths:
   /data/menu_ramen:
     get:
@@ -54,38 +56,115 @@ paths:
     put:
       tags:
         - Menu Ramen
-      summary: Mengubah data menu ramen
+      summary: Mengubah data menu ramen berdasarkan ID
       operationId: putMenuRamen
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Menu'
+              $ref: '#/components/schemas/Menu_Update'
       responses:
         "200":
           description: Menu ramen berhasil diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
         "400":
-          description: Kesalahan saat mengubah menu ramen
+          description: ID tidak valid atau request body tidak sesuai
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "ID is missing or invalid"
+        "404":
+          description: Menu tidak ditemukan atau tidak ada perubahan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Document not found or not modified"
+        "500":
+          description: Terjadi kesalahan pada server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal Server Error"
 
+  paths:
   /hapus/menu_ramen:
     delete:
       tags:
         - Menu Ramen
-      summary: Menghapus menu ramen
+      summary: Menghapus menu ramen berdasarkan ID
       operationId: deleteMenuRamen
-      parameters:
-        - name: id
-          in: query
-          required: true
-          schema:
-            type: string
-            format: objectId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: ID menu ramen yang akan dihapus
+                  example: "67a0a085f8baa9f78f56de76"
       responses:
         "200":
           description: Menu ramen berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Document deleted successfully"
         "400":
-          description: Kesalahan saat menghapus menu ramen
+          description: ID tidak valid atau kesalahan saat menghapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid ID format"
+        "404":
+          description: Menu ramen tidak ditemukan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Document not found"
+        "500":
+          description: Terjadi kesalahan pada server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to delete document"
+                  error:
+                    type: string
+                    example: "MongoDB connection error"
+
 
   /data/pesanan:
     get:
@@ -113,9 +192,7 @@ paths:
                     type: string
                     example: "Error retrieving data"
 
-
-
-
+  
   /tambah/pesanan:
     post:
       tags:
@@ -133,8 +210,16 @@ paths:
           description: Pesanan berhasil ditambahkan
         "400":
           description: Kesalahan saat menambahkan pesanan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Data pesanan tidak valid"
 
-          /data/bystatus:
+  /data/bystatus:
     get:
       tags:
         - Pesanan
@@ -156,7 +241,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/pesanan'
+                  $ref: '#/components/schemas/Pesanan'
         "400":
           description: Status pesanan tidak valid atau tidak disertakan
           content:
@@ -177,6 +262,7 @@ paths:
                   error:
                     type: string
                     example: "Pesanan tidak ditemukan dengan status ini"
+
 
   /update/status:
     patch:
@@ -266,6 +352,29 @@ components:
         kategori:
           type: string
           description: Kategori menu
+
+    Menu_Update:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "67a09556f8baa9f78f56de74"
+        nama_menu:
+          type: string
+          example: "Cappucino cincau hahay"
+        harga:
+          type: integer
+          example: 15000
+        deskripsi:
+          type: string
+          example: "segar dan nikmat"
+        gambar:
+          type: string
+          format: uri
+          example: "https://asset.kompas.com/crops/PdRBq63giN_h8a7s3jecy1NmMCc=/0x0:780x520/1200x800/data/photo/2020/11/19/5fb5de3b29211.jpg"
+        kategori:
+          type: string
+          example: "minuman"
 
     Pesanan:
       type: object
